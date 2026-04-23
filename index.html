@@ -215,6 +215,55 @@ const S = (f,h,st,m,sc,a,c) => ({fending:f,healing:h,striking:st,maiming:m,scout
 const getSeries = (d, catId) => typeof d.s === "string" ? d.s : (d.s[catId] || "―");
 
 const EXPANSIONS = [
+  { id:"dt", name:"黄金のレガシー", patch:"7.x", dungeons:[
+    {id:"ihuykatumu",   name:"イフイカ・トゥム",             s:"リバーズブレス", patch:"7.0"},
+    {id:"worqor",       name:"ウォーコー・ゾーモー",         s:"ゾーモー",       patch:"7.0"},
+    {id:"skydeep",      name:"天深きセノーテ",               s:"スカイディープ", patch:"7.0"},
+    {id:"vanguard",     name:"ヴァンガード",                 s:"ヴァンガード",   patch:"7.0"},
+    {id:"yuweyawata",   name:"ユウェヤーワータ",             s:"ユウェヤーワータ",patch:"7.1"},
+    {id:"underkeep",    name:"アンダーキープ",               s:"アンダーキープ", patch:"7.2"},
+    {id:"meso_term",    name:"永久幽界メインターミナル",     s:"ミスティックメモリー",patch:"7.3"},
+    {id:"mistwake",     name:"ミストウェイク",               s:"ミストウェイク", patch:"7.4"},
+    {id:"curtius",      name:"クルティウス",                  s:"―",              patch:"7.5", upcoming:true},
+  ]},
+  { id:"ew", name:"暁月のフィナーレ", patch:"6.x", dungeons:[
+    {id:"tower_zot",    name:"ゾットの塔",                   s:"マヌシャ",       patch:"6.0"},
+    {id:"tower_babil",  name:"バブイルの塔",                 s:"インペリアル",   patch:"6.0"},
+    {id:"vanaspati",    name:"ヴァナスパティ",               s:"パーラカ",       patch:"6.0"},
+    {id:"ktisis",       name:"ヒュペルボレア造物院",         s:"キティセオス",   patch:"6.0"},
+    {id:"alzadaal",     name:"アルザダール海底遺跡群",       s:"ダーバー",       patch:"6.1"},
+    {id:"troia",        name:"トロイアコート",               s:"トロイアン",     patch:"6.2"},
+    {id:"lapis",        name:"ラピス・マナリス",             s:"マナリス",       patch:"6.3"},
+    {id:"aetherfont",   name:"ハーム島",                     s:"ディスタンス",   patch:"6.4"},
+    {id:"lunar_sub",    name:"月の地下渓谷",                s:"ヴォイドムーン", patch:"6.5"},
+  ]},
+  { id:"shb", name:"漆黒のヴィランズ", patch:"5.x", dungeons:[
+    {id:"holminster",   name:"ホルミンスター",               s:"ランドレイク",   patch:"5.0"},
+    {id:"dohn_mheg",    name:"ドォーヌ・メグ",               s:"フッブート",     patch:"5.0"},
+    {id:"qitana",       name:"キタンナ神影洞",               s:"キタンナ",       patch:"5.0"},
+    {id:"malikahs",     name:"マリカの大井戸",               s:"ナバスアレン",   patch:"5.0"},
+    {id:"mt_gulg",      name:"グルグ火山",                   s:"フォーギヴン",   patch:"5.0"},
+    {id:"grand_cosmos", name:"グラン・コスモス",             s:"ワーグ",         patch:"5.1"},
+    {id:"anamnesis",    name:"アニドラス・アナムネーシス",   s:"アナムネーシス", patch:"5.2"},
+    {id:"norvrandt",    name:"ノルヴラント",                  s:"シャドウレス",   patch:"5.3"},
+    {id:"matoyas",      name:"マトーヤのアトリエ",           s:"エアルーム",     patch:"5.4"},
+    {id:"paglth",       name:"パガルザン",                   s:"パガルザン",     patch:"5.5"},
+  ]},
+  { id:"sb", name:"紅蓮のリベレーター", patch:"4.x", dungeons:[
+    {id:"sirensong",    name:"セイレーン海",                 s:"ゴーストバーク", patch:"4.0"},
+    {id:"shisui",       name:"紫水宮",                       s:"紫水",           patch:"4.0"},
+    {id:"bardams",      name:"バルダム覇道",                 s:"ノマド",         patch:"4.0"},
+    {id:"doma_castle",  name:"ドマ城",                       s:"延夏",           patch:"4.0"},
+    {id:"castrum_ab",   name:"カストルム・アバニア",
+     s:S("ゼノビアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン"),
+     patch:"4.0"},
+    {id:"arhat",        name:"アラミゴ / クガネ城 / 星導山", s:"羅漢",           patch:"4.0", merged:true},
+    {id:"skalla",       name:"スカラ",                       s:"スカラ",         patch:"4.2"},
+    {id:"farlander",    name:"獄之蓋 / フラクタル (H)",      s:"フォーレン",     patch:"4.3", merged:true},
+    {id:"swallow",      name:"ガンエン廟",                   s:"ボーンウィッカ", patch:"4.4"},
+    {id:"volunteer",    name:"ザ・バーン / 聖モシャーヌ (H)",s:"ボランティア",   patch:"4.5", merged:true},
+    {id:"ghimlyt",      name:"ギムリトダーク",               s:"アライアンス",   patch:"4.5"},
+  ]},
   { id:"hw", name:"蒼天のイシュガルド", patch:"3.x", dungeons:[
     {id:"dusk_vigil",   name:"ダスクヴィジル",               s:"イシュガルド",   patch:"3.0"},
     {id:"sohm_al",      name:"ソーム・アル",                 s:"ウォード",       patch:"3.0"},
@@ -232,62 +281,21 @@ const EXPANSIONS = [
     {id:"valkyrie",     name:"ゼルファトル / グブラ (H)",    s:"ヴァルキリー",   patch:"3.5", merged:true},
     {id:"filibuster",   name:"バエサル / ソーム・アル (H)",  s:"フィリバスター", patch:"3.5", merged:true},
   ]},
-  { id:"sb", name:"紅蓮のリベレーター", patch:"4.x", dungeons:[
-    {id:"sirensong",    name:"セイレーン海",                 s:"ゴーストバーク", patch:"4.0"},
-    {id:"shisui",       name:"紫水宮",                       s:"紫水",           patch:"4.0"},
-    {id:"bardams",      name:"バルダム覇道",                 s:"ノマド",         patch:"4.0"},
-    {id:"doma_castle",  name:"ドマ城",                       s:"延夏",           patch:"4.0"},
-    {id:"castrum_ab",   name:"カストルム・アバニア",
-     s:S("ゼノビアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン"),
-     patch:"4.0"},
-    {id:"arhat",        name:"アラミゴ / クガネ城 / 星導山", s:"羅漢",           patch:"4.0", merged:true},
-    {id:"skalla",       name:"スカラ",                       s:"スカラ",         patch:"4.2"},
-    {id:"farlander",    name:"獄之蓋 / フラクタル (H)",      s:"フォーレン",     patch:"4.3", merged:true},
-    {id:"swallow",      name:"ガンエン廟",                   s:"ボーンウィッカ", patch:"4.4"},
-    {id:"volunteer",    name:"ザ・バーン / 聖モシャーヌ (H)",s:"ボランティア",   patch:"4.5", merged:true},
-    {id:"ghimlyt",      name:"ギムリトダーク",               s:"アライアンス",   patch:"4.5"},
-  ]},
-  { id:"shb", name:"漆黒のヴィランズ", patch:"5.x", dungeons:[
-    {id:"holminster",   name:"ホルミンスター",               s:"ランドレイク",   patch:"5.0"},
-    {id:"dohn_mheg",    name:"ドォーヌ・メグ",               s:"フッブート",     patch:"5.0"},
-    {id:"qitana",       name:"キタンナ神影洞",               s:"キタンナ",       patch:"5.0"},
-    {id:"malikahs",     name:"マリカの大井戸",               s:"ナバスアレン",   patch:"5.0"},
-    {id:"mt_gulg",      name:"グルグ火山",                   s:"フォーギヴン",   patch:"5.0"},
-    {id:"grand_cosmos", name:"グラン・コスモス",             s:"ワーグ",         patch:"5.1"},
-    {id:"anamnesis",    name:"アニドラス・アナムネーシス",   s:"アナムネーシス", patch:"5.2"},
-    {id:"norvrandt",    name:"ノルヴラント",                  s:"シャドウレス",   patch:"5.3"},
-    {id:"matoyas",      name:"マトーヤのアトリエ",           s:"エアルーム",     patch:"5.4"},
-    {id:"paglth",       name:"パガルザン",                   s:"パガルザン",     patch:"5.5"},
-  ]},
-  { id:"ew", name:"暁月のフィナーレ", patch:"6.x", dungeons:[
-    {id:"tower_zot",    name:"ゾットの塔",                   s:"マヌシャ",       patch:"6.0"},
-    {id:"tower_babil",  name:"バブイルの塔",                 s:"インペリアル",   patch:"6.0"},
-    {id:"vanaspati",    name:"ヴァナスパティ",               s:"パーラカ",       patch:"6.0"},
-    {id:"ktisis",       name:"ヒュペルボレア造物院",         s:"キティセオス",   patch:"6.0"},
-    {id:"alzadaal",     name:"アルザダール海底遺跡群",       s:"ダーバー",       patch:"6.1"},
-    {id:"troia",        name:"トロイアコート",               s:"トロイアン",     patch:"6.2"},
-    {id:"lapis",        name:"ラピス・マナリス",             s:"マナリス",       patch:"6.3"},
-    {id:"aetherfont",   name:"ハーム島",                     s:"ディスタンス",   patch:"6.4"},
-    {id:"lunar_sub",    name:"月の地下渓谷",                s:"ヴォイドムーン", patch:"6.5"},
-  ]},
-  { id:"dt", name:"黄金のレガシー", patch:"7.x", dungeons:[
-    {id:"ihuykatumu",   name:"イフイカ・トゥム",             s:"リバーズブレス", patch:"7.0"},
-    {id:"worqor",       name:"ウォーコー・ゾーモー",         s:"ゾーモー",       patch:"7.0"},
-    {id:"skydeep",      name:"天深きセノーテ",               s:"スカイディープ", patch:"7.0"},
-    {id:"vanguard",     name:"ヴァンガード",                 s:"ヴァンガード",   patch:"7.0"},
-    {id:"yuweyawata",   name:"ユウェヤーワータ",             s:"ユウェヤーワータ",patch:"7.1"},
-    {id:"underkeep",    name:"アンダーキープ",               s:"アンダーキープ", patch:"7.2"},
-    {id:"meso_term",    name:"永久幽界メインターミナル",     s:"ミスティックメモリー",patch:"7.3"},
-    {id:"mistwake",     name:"ミストウェイク",               s:"ミストウェイク", patch:"7.4"},
-  ]},
 ];
 
 const STORAGE_KEY = "ff14_id_checklist_v2";
+// 最新パッチのID（先頭のエクスパンション）
+const LATEST_EXP_ID = EXPANSIONS[0].id;
 
 function App() {
   const [activeCat, setActiveCat] = useState("fending");
   const [checks, setChecks]       = useState({});
-  const [collapsed, setCollapsed] = useState({});
+  // 最新以外を初期で閉じる
+  const initCollapsed = EXPANSIONS.reduce((acc, exp) => {
+    if (exp.id !== LATEST_EXP_ID) acc[exp.id] = true;
+    return acc;
+  }, {});
+  const [collapsed, setCollapsed] = useState(initCollapsed);
   const [incOnly, setIncOnly]     = useState(false);
 
   useEffect(() => {
@@ -439,9 +447,12 @@ function App() {
                   className:"cell-name-main"+(d.merged?" merged":"")+(isDone?" crossed":""),
                   style:{color: isDone ? undefined : "var(--text)"}
                 }, d.name),
-                e("div",{className:"cell-series",style:{color:cat.color}},
-                  sName,
-                  isMulti && e("span",{className:"role-tag"},"(ロール別)")
+                e("div",{className:"cell-series",style:{
+                  color: d.upcoming ? "var(--text3)" : cat.color,
+                  fontStyle: d.upcoming ? "italic" : "normal"
+                }},
+                  d.upcoming ? "未確認" : sName,
+                  !d.upcoming && isMulti && e("span",{className:"role-tag"},"(ロール別)")
                 )
               ),
               ...SLOTS.map((_,si) => e(SlotBox,{key:si,d,si})),
