@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FF14 ID装備チェックリスト</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f5f5;
+    --bg3: #ebebeb;
+    --text: #1a1a1a;
+    --text2: #555;
+    --text3: #999;
+    --border: rgba(0,0,0,0.12);
+    --border2: rgba(0,0,0,0.22);
+    --radius: 8px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1e1e1e;
+      --bg2: #2a2a2a;
+      --bg3: #333;
+      --text: #e8e8e8;
+      --text2: #aaa;
+      --text3: #666;
+      --border: rgba(255,255,255,0.12);
+      --border2: rgba(255,255,255,0.22);
+    }
+  }
+  body {
+    background: var(--bg3);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  #app {
+    max-width: 760px;
+    margin: 0 auto;
+    background: var(--bg);
+    min-height: 100vh;
+    padding: 0 0 3rem;
+  }
+  h1 {
+    font-size: 16px;
+    font-weight: 500;
+    padding: 14px 16px 0;
+    color: var(--text);
+  }
+  .subtitle {
+    font-size: 11px;
+    color: var(--text3);
+    padding: 2px 16px 12px;
+  }
+  .header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: var(--bg);
+    border-bottom: 0.5px solid var(--border);
+    padding: 10px 16px;
+  }
+  .cat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 8px;
+  }
+  .cat-btn {
+    padding: 3px 10px;
+    border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+    background: transparent;
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 12px;
+    font-family: var(--font);
+    transition: all 0.12s;
+  }
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .progress-label { font-size: 11px; color: var(--text2); white-space: nowrap; }
+  .progress-bar {
+    flex: 1;
+    height: 3px;
+    background: var(--bg3);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .progress-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+  .filter-label {
+    font-size: 11px;
+    color: var(--text2);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    user-select: none;
+    white-space: nowrap;
+  }
+  .exp-block { margin: 12px 16px 0; }
+  .exp-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius) var(--radius) 0 0;
+    cursor: pointer;
+    user-select: none;
+  }
+  .exp-head.collapsed { border-radius: var(--radius); }
+  .exp-head-name { font-size: 13px; font-weight: 500; }
+  .exp-head-tag { font-size: 10px; color: var(--text3); }
+  .exp-head-prog { font-size: 10px; color: var(--text2); }
+  .exp-table {
+    border: 0.5px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 var(--radius) var(--radius);
+    overflow: hidden;
+  }
+  .table-row {
+    display: grid;
+    grid-template-columns: 34px 1fr 34px 34px 34px 34px 34px 44px;
+    align-items: center;
+    padding: 5px 10px;
+    border-bottom: 0.5px solid var(--border);
+    transition: opacity 0.2s;
+  }
+  .table-row.even { background: transparent; }
+  .table-row.odd  { background: var(--bg2); }
+  .table-row.done { opacity: 0.4; }
+  .table-head {
+    background: var(--bg2);
+    padding: 3px 10px;
+  }
+  .cell-ver { font-size: 9px; color: var(--text3); }
+  .cell-name { overflow: hidden; }
+  .cell-name-main {
+    font-size: 12px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cell-name-main.merged { font-weight: 500; }
+  .cell-name-main.crossed { text-decoration: line-through; color: var(--text3); }
+  .cell-series {
+    font-size: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 1px;
+  }
+  .cell-series .role-tag { font-size: 9px; color: var(--text3); margin-left: 4px; }
+  .cell-slot { display: flex; justify-content: center; }
+  .slot-box {
+    width: 20px; height: 20px;
+    border-radius: 3px;
+    border: 1.5px solid var(--border2);
+    background: transparent;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500;
+    transition: all 0.1s;
+    user-select: none;
+  }
+  .cell-all { display: flex; justify-content: center; }
+  .all-btn {
+    padding: 2px 5px;
+    border-radius: 3px;
+    border: 0.5px solid var(--border);
+    background: transparent;
+    cursor: pointer;
+    font-size: 10px;
+    font-family: var(--font);
+    transition: all 0.1s;
+  }
+  .footer {
+    font-size: 10px;
+    color: var(--text3);
+    text-align: center;
+    padding: 20px 16px 0;
+  }
+  input[type="checkbox"] { cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const { useState, useEffect } = React;
+
+const CATS = [
+  { id:"fending",  jp:"ディフェンダー", en:"Fending",  jobs:"PLD/WAR/DRK/GNB", color:"#378ADD" },
+  { id:"healing",  jp:"ヒーラー",       en:"Healing",  jobs:"WHM/SCH/AST/SGE", color:"#1D9E75" },
+  { id:"striking", jp:"ストライカー",   en:"Striking", jobs:"MNK/SAM",          color:"#BA7517" },
+  { id:"maiming",  jp:"スレイヤー",     en:"Maiming",  jobs:"DRG/RPR",          color:"#D85A30" },
+  { id:"scouting", jp:"スカウト",       en:"Scouting", jobs:"NIN/VPR",          color:"#7F77DD" },
+  { id:"aiming",   jp:"レンジ",         en:"Aiming",   jobs:"BRD/MCH/DNC",      color:"#639922" },
+  { id:"casting",  jp:"キャスター",     en:"Casting",  jobs:"BLM/SMN/RDM/PCT",  color:"#D4537E" },
+];
+
+const SLOTS = ["頭","胴","手","脚","足"];
+
+const S = (f,h,st,m,sc,a,c) => ({fending:f,healing:h,striking:st,maiming:m,scouting:sc,aiming:a,casting:c});
+const getSeries = (d, catId) => typeof d.s === "string" ? d.s : (d.s[catId] || "―");
+
+const EXPANSIONS = [
+  { id:"hw", name:"蒼天のイシュガルド", patch:"3.x", dungeons:[
+    {id:"dusk_vigil",   name:"ダスクヴィジル",               s:"イシュガルド",   patch:"3.0"},
+    {id:"sohm_al",      name:"ソーム・アル",                 s:"ウォード",       patch:"3.0"},
+    {id:"the_aery",     name:"ドラゴンズエアリー",           s:"オーソドックス", patch:"3.0"},
+    {id:"the_vault",    name:"イシュガルド教皇庁",           s:"ハロニック",     patch:"3.0"},
+    {id:"great_gubal",  name:"グブラ幻想図書館",             s:"シャーレアン",   patch:"3.0"},
+    {id:"valerian",     name:"ネバーリープ / フラクタル",    s:"ヴァレリアン",   patch:"3.1", merged:true},
+    {id:"saint_moc",    name:"聖モシャーヌ / シリウス (H)",
+     s:S("ディファイアント","プレイグドクター","レッドシーフ","デアリング","ゴーストシーフ","ロストシーフ","プレイグブリンガー"),
+     patch:"3.2", merged:true},
+    {id:"dravanian",    name:"逆さの塔 / アムダプール (H)",  s:"ドラバニアン",   patch:"3.3", merged:true},
+    {id:"sohr_khai",    name:"ソール・カイ / ハルブレーカー (H)",
+     s:S("バーサーカー","プロフェット","コンカラー","バイキング","サブジュゲーター","ラングラー","パネジリスト"),
+     patch:"3.4", merged:true},
+    {id:"valkyrie",     name:"ゼルファトル / グブラ (H)",    s:"ヴァルキリー",   patch:"3.5", merged:true},
+    {id:"filibuster",   name:"バエサル / ソーム・アル (H)",  s:"フィリバスター", patch:"3.5", merged:true},
+  ]},
+  { id:"sb", name:"紅蓮のリベレーター", patch:"4.x", dungeons:[
+    {id:"sirensong",    name:"セイレーン海",                 s:"ゴーストバーク", patch:"4.0"},
+    {id:"shisui",       name:"紫水宮",                       s:"紫水",           patch:"4.0"},
+    {id:"bardams",      name:"バルダム覇道",                 s:"ノマド",         patch:"4.0"},
+    {id:"doma_castle",  name:"ドマ城",                       s:"延夏",           patch:"4.0"},
+    {id:"castrum_ab",   name:"カストルム・アバニア",
+     s:S("ゼノビアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン","ヴァレリアン"),
+     patch:"4.0"},
+    {id:"arhat",        name:"アラミゴ / クガネ城 / 星導山", s:"羅漢",           patch:"4.0", merged:true},
+    {id:"skalla",       name:"スカラ",                       s:"スカラ",         patch:"4.2"},
+    {id:"farlander",    name:"獄之蓋 / フラクタル (H)",      s:"フォーレン",     patch:"4.3", merged:true},
+    {id:"swallow",      name:"ガンエン廟",                   s:"ボーンウィッカ", patch:"4.4"},
+    {id:"volunteer",    name:"ザ・バーン / 聖モシャーヌ (H)",s:"ボランティア",   patch:"4.5", merged:true},
+    {id:"ghimlyt",      name:"ギムリトダーク",               s:"アライアンス",   patch:"4.5"},
+  ]},
+  { id:"shb", name:"漆黒のヴィランズ", patch:"5.x", dungeons:[
+    {id:"holminster",   name:"ホルミンスター",               s:"ランドレイク",   patch:"5.0"},
+    {id:"dohn_mheg",    name:"ドォーヌ・メグ",               s:"フッブート",     patch:"5.0"},
+    {id:"qitana",       name:"キタンナ神影洞",               s:"キタンナ",       patch:"5.0"},
+    {id:"malikahs",     name:"マリカの大井戸",               s:"ナバスアレン",   patch:"5.0"},
+    {id:"mt_gulg",      name:"グルグ火山",                   s:"フォーギヴン",   patch:"5.0"},
+    {id:"grand_cosmos", name:"グラン・コスモス",             s:"ワーグ",         patch:"5.1"},
+    {id:"anamnesis",    name:"アニドラス・アナムネーシス",   s:"アナムネーシス", patch:"5.2"},
+    {id:"norvrandt",    name:"ノルヴラント",                  s:"シャドウレス",   patch:"5.3"},
+    {id:"matoyas",      name:"マトーヤのアトリエ",           s:"エアルーム",     patch:"5.4"},
+    {id:"paglth",       name:"パガルザン",                   s:"パガルザン",     patch:"5.5"},
+  ]},
+  { id:"ew", name:"暁月のフィナーレ", patch:"6.x", dungeons:[
+    {id:"tower_zot",    name:"ゾットの塔",                   s:"マヌシャ",       patch:"6.0"},
+    {id:"tower_babil",  name:"バブイルの塔",                 s:"インペリアル",   patch:"6.0"},
+    {id:"vanaspati",    name:"ヴァナスパティ",               s:"パーラカ",       patch:"6.0"},
+    {id:"ktisis",       name:"ヒュペルボレア造物院",         s:"キティセオス",   patch:"6.0"},
+    {id:"alzadaal",     name:"アルザダール海底遺跡群",       s:"ダーバー",       patch:"6.1"},
+    {id:"troia",        name:"トロイアコート",               s:"トロイアン",     patch:"6.2"},
+    {id:"lapis",        name:"ラピス・マナリス",             s:"マナリス",       patch:"6.3"},
+    {id:"aetherfont",   name:"ハーム島",                     s:"ディスタンス",   patch:"6.4"},
+    {id:"lunar_sub",    name:"月の地下渓谷",                s:"ヴォイドムーン", patch:"6.5"},
+  ]},
+  { id:"dt", name:"黄金のレガシー", patch:"7.x", dungeons:[
+    {id:"ihuykatumu",   name:"イフイカ・トゥム",             s:"リバーズブレス", patch:"7.0"},
+    {id:"worqor",       name:"ウォーコー・ゾーモー",         s:"ゾーモー",       patch:"7.0"},
+    {id:"skydeep",      name:"天深きセノーテ",               s:"スカイディープ", patch:"7.0"},
+    {id:"vanguard",     name:"ヴァンガード",                 s:"ヴァンガード",   patch:"7.0"},
+    {id:"yuweyawata",   name:"ユウェヤーワータ",             s:"ユウェヤーワータ",patch:"7.1"},
+    {id:"underkeep",    name:"アンダーキープ",               s:"アンダーキープ", patch:"7.2"},
+    {id:"meso_term",    name:"永久幽界メインターミナル",     s:"ミスティックメモリー",patch:"7.3"},
+    {id:"mistwake",     name:"ミストウェイク",               s:"ミストウェイク", patch:"7.4"},
+  ]},
+];
+
+const STORAGE_KEY = "ff14_id_checklist_v2";
+
+function App() {
+  const [activeCat, setActiveCat] = useState("fending");
+  const [checks, setChecks]       = useState({});
+  const [collapsed, setCollapsed] = useState({});
+  const [incOnly, setIncOnly]     = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) setChecks(JSON.parse(saved));
+    } catch(e) {}
+  }, []);
+
+  const persist = c => {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(c)); } catch(e) {}
+  };
+
+  const got   = (d,c,i) => !!checks[d+"|"+c+"|"+i];
+  const cnt   = (d,c)   => SLOTS.filter((_,i) => got(d,c,i)).length;
+  const done  = (d,c)   => cnt(d,c) === SLOTS.length;
+
+  const toggle = (d,c,i) => {
+    const next = {...checks, [d+"|"+c+"|"+i]: !got(d,c,i)};
+    setChecks(next); persist(next);
+  };
+  const markAll = (d,c) => {
+    const isDone = done(d,c);
+    const next = {...checks};
+    SLOTS.forEach((_,i) => { next[d+"|"+c+"|"+i] = !isDone; });
+    setChecks(next); persist(next);
+  };
+
+  const expStats = (exp, cId) => {
+    const total = exp.dungeons.length * SLOTS.length;
+    const g = exp.dungeons.reduce((a,d) => a + cnt(d.id, cId), 0);
+    return { got:g, total, pct: total>0 ? Math.round((g/total)*100) : 0 };
+  };
+  const overall = EXPANSIONS.reduce((a,exp) => {
+    const s = expStats(exp, activeCat);
+    return { got: a.got+s.got, total: a.total+s.total };
+  }, {got:0, total:0});
+  const overallPct = overall.total>0 ? Math.round((overall.got/overall.total)*100) : 0;
+  const totalEntries = EXPANSIONS.reduce((a,e) => a+e.dungeons.length, 0);
+  const cat = CATS.find(c => c.id===activeCat);
+
+  const e = React.createElement;
+
+  const SlotBox = ({d, si}) => {
+    const checked = got(d.id, activeCat, si);
+    return e("div", {className:"cell-slot"},
+      e("div", {
+        className:"slot-box",
+        style:{
+          borderColor: checked ? cat.color : undefined,
+          background: checked ? cat.color+"25" : undefined,
+          color: cat.color
+        },
+        onClick: ()=>toggle(d.id, activeCat, si)
+      }, checked ? "✓" : "")
+    );
+  };
+
+  const AllBtn = ({d}) => {
+    const isDone = done(d.id, activeCat);
+    return e("div", {className:"cell-all"},
+      e("button", {
+        className:"all-btn",
+        style:{
+          borderColor: isDone ? undefined : cat.color+"77",
+          background: isDone ? undefined : cat.color+"15",
+          color: isDone ? undefined : cat.color
+        },
+        onClick: ()=>markAll(d.id, activeCat)
+      }, isDone ? "解除" : "全済")
+    );
+  };
+
+  return e("div", null,
+    e("h1", null, "FF14 ID装備チェックリスト"),
+    e("p", {className:"subtitle"}, "パッチ3.0〜7.4 ／ アクセサリーのみID除外・同一シリーズID統合済み"),
+
+    // ── スティッキーヘッダー ──
+    e("div", {className:"header-sticky"},
+      e("div", {className:"cat-row"},
+        CATS.map(c => e("button", {
+          key: c.id,
+          className: "cat-btn",
+          style:{
+            borderColor: activeCat===c.id ? c.color : undefined,
+            background:  activeCat===c.id ? c.color+"22" : undefined,
+            color:       activeCat===c.id ? c.color : undefined,
+            fontWeight:  activeCat===c.id ? "500" : undefined
+          },
+          onClick: ()=>setActiveCat(c.id)
+        }, c.jp))
+      ),
+      e("div", {className:"progress-row"},
+        e("span", {className:"progress-label"}, cat.en+" — "+cat.jobs),
+        e("div", {className:"progress-bar"},
+          e("div", {className:"progress-fill", style:{width:overallPct+"%", background:cat.color}})
+        ),
+        e("span", {className:"progress-label"}, overall.got+"/"+overall.total+" ("+overallPct+"%)"),
+        e("label", {className:"filter-label"},
+          e("input", {type:"checkbox", checked:incOnly, onChange:ev=>setIncOnly(ev.target.checked)}),
+          "未取得のみ"
+        )
+      )
+    ),
+
+    // ── エクスパンション ──
+    ...EXPANSIONS.map(exp => {
+      const stats = expStats(exp, activeCat);
+      const isCol = !!collapsed[exp.id];
+      const visible = incOnly ? exp.dungeons.filter(d=>!done(d.id,activeCat)) : exp.dungeons;
+      if (incOnly && visible.length===0) return null;
+
+      return e("div", {key:exp.id, className:"exp-block"},
+        e("div", {
+          className:"exp-head"+(isCol?" collapsed":""),
+          onClick:()=>setCollapsed(p=>({...p,[exp.id]:!p[exp.id]}))
+        },
+          e("span",{style:{fontSize:"10px",color:"#999",width:"10px"}}, isCol?"+":" −"),
+          e("span",{className:"exp-head-name"}, exp.name),
+          e("span",{className:"exp-head-tag"}, exp.patch),
+          e("span",{className:"exp-head-tag",style:{marginLeft:"4px"}}, exp.dungeons.length+"項目"),
+          e("div",{style:{flex:1}}),
+          e("div",{className:"progress-bar",style:{width:"72px",flex:"none"}},
+            e("div",{className:"progress-fill",style:{width:stats.pct+"%",background:cat.color}})
+          ),
+          e("span",{className:"exp-head-prog"}, stats.got+"/"+stats.total)
+        ),
+
+        !isCol && e("div",{className:"exp-table"},
+          // ヘッダ行
+          e("div",{className:"table-row table-head",style:{borderBottom:"0.5px solid var(--border)"}},
+            e("span",{style:{fontSize:"9px",color:"var(--text3)"}},"ver"),
+            e("span",{style:{fontSize:"9px",color:"var(--text3)"}},"ダンジョン　シリーズ"),
+            ...SLOTS.map(s=>e("span",{key:s,style:{fontSize:"9px",color:"var(--text3)",textAlign:"center"}},s)),
+            e("span",{style:{fontSize:"9px",color:"var(--text3)",textAlign:"center"}},"一括")
+          ),
+          // データ行
+          ...visible.map((d,idx)=>{
+            const isDone = done(d.id, activeCat);
+            const sName  = getSeries(d, activeCat);
+            const isMulti = typeof d.s === "object";
+            return e("div",{
+              key:d.id,
+              className:`table-row ${idx%2===0?"even":"odd"}${isDone?" done":""}`
+            },
+              e("span",{className:"cell-ver"},d.patch),
+              e("div",{className:"cell-name"},
+                e("div",{
+                  className:"cell-name-main"+(d.merged?" merged":"")+(isDone?" crossed":""),
+                  style:{color: isDone ? undefined : "var(--text)"}
+                }, d.name),
+                e("div",{className:"cell-series",style:{color:cat.color}},
+                  sName,
+                  isMulti && e("span",{className:"role-tag"},"(ロール別)")
+                )
+              ),
+              ...SLOTS.map((_,si) => e(SlotBox,{key:si,d,si})),
+              e(AllBtn,{d})
+            );
+          })
+        )
+      );
+    }),
+
+    e("p",{className:"footer"},
+      "計"+totalEntries+"項目　データはこのブラウザにのみ保存されます"
+    )
+  );
+}
+
+ReactDOM.render(React.createElement(App), document.getElementById("app"));
+</script>
+</body>
+</html>
